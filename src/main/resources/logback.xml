@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+    <!--日志根目录-->
+    <property name="LOG_HOME" value="logs" />
+    <!--服务名称-->
+    <property name="SERVICE_NAME" value="@project.artifactId@" />
+    <include optional="true" resource="cn/hrfax/core/log/logback-common.xml"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are by default assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d %-5p %5r --- [%X{X-B3-TraceId:-},%X{X-B3-ParentSpanId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] morpheus-%-40c : %m%n</pattern>
+            <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+            <!-- 常用的Pattern变量,大家可打开该pattern进行输出观察 -->
+            <!-- <pattern> %d{yyyy-MM-dd HH:mm:ss} [%level] - %msg%n Logger: %logger
+                Class: %class File: %file Caller: %caller Line: %line Message: %m Method:
+                %M Relative: %relative Thread: %thread Exception: %ex xException: %xEx nopException:
+                %nopex rException: %rEx Marker: %marker %n </pattern> -->
+        </encoder>
+    </appender>
+    <!-- 按日期区分的滚动日志 -->
+    <appender name="ERROR-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/error.log</file>
+        <encoder>
+            <pattern>%d %-5p %5r --- [%X{X-B3-TraceId:-},%X{X-B3-ParentSpanId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] %-40c : %m%n</pattern>
+            <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/error-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>90</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="INFO-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/info.log</file>
+        <encoder>
+            <pattern>%d %-5p %5r --- [%X{X-B3-TraceId:-},%X{X-B3-ParentSpanId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] %-40c : %m%n</pattern>
+            <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/info.%d{yyyy-MM-dd}.%i.log.zip
+            </fileNamePattern>
+            <!-- keep 90 days' worth of history -->
+            <maxHistory>90</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 按日期和大小区分的滚动日志 -->
+    <appender name="DEBUG-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/debug.log</file>
+        <encoder>
+            <pattern>%d %-5p %5r --- [%X{X-B3-TraceId:-},%X{X-B3-ParentSpanId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] - [%thread] %-40c : %m%n</pattern>
+            <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/debug-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>90</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="biz-debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/dc-debug.log</file>
+        <encoder charset="utf-8" class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"servicename":"@project.artifactId@"}</customFields>
+            <includeMdcKeyName>X-B3-TraceId</includeMdcKeyName>
+            <includeMdcKeyName>X-B3-ParentSpanId</includeMdcKeyName>
+            <includeMdcKeyName>X-B3-SpanId</includeMdcKeyName>
+            <includeMdcKeyName>X-Span-Export</includeMdcKeyName>
+            <includeCallerData>true</includeCallerData>
+            <includeContext>true</includeContext>
+            <timeZone>UTC</timeZone>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>logs/dc-debug-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="test-debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/test.log</file>
+        <encoder>
+            <pattern>%d %-5p %5r --- [%X{X-B3-TraceId:-},%X{X-B3-ParentSpanId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}] %-40c : %m%n</pattern>
+            <charset>UTF-8</charset> <!-- 此处设置字符集 -->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>logs/test-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="msg-stream" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/msg-stream.log</file>
+        <encoder charset="utf-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <pattern>
+                    <pattern>
+                        {
+                        "servicename":"@project.artifactId@",
+                        "requestId": "%mdc{requestId}",
+                        "logger": "%logger",
+                        "level": "%level",
+                        "thread": "%thread",
+                        "message": "#asJson{%message}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>logs/msg-stream-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="test" level="DEBUG">
+        <appender-ref ref="test-debug"/>
+    </logger>
+
+    <!-- 记录数据库异常后的数据 -->
+    <logger name="net.dc" level="DEBUG">
+        <appender-ref ref="biz-debug"/>
+    </logger>
+    <logger name="net.dc.event" level="DEBUG">
+        <appender-ref ref="msg-stream"/>
+    </logger>
+    <logger name="com.amazonaws" level="DEBUG">
+        <appender-ref ref="biz-debug"/>
+    </logger>
+    <logger name="org.springframework" level="ERROR">
+        <appender-ref ref="biz-debug"/>
+    </logger>
+    <logger name="com.netflix.discovery" level="WARN">
+    </logger> 
+    <logger name="org.apache.http.wire" level="INFO"/>
+    <logger name="ma.glasnost.orika" level="INFO"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ERROR-OUT"/>
+        <appender-ref ref="biz-debug"/>
+        <appender-ref ref="INFO-OUT"/>
+        <appender-ref ref="DEBUG-OUT"/>
+    </root>
+</configuration>

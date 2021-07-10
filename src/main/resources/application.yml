@@ -1,0 +1,63 @@
+server:
+  port: 5013
+spring:
+  profiles:
+    active: ${spring.profiles.active}
+  datasource:
+    hikari:
+      charizard:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://${charizard_db_ip}:3306/charizard?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${charizard_db_username}
+        password: ${charizard_db_password}
+      stitch:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://${stitch_db_ip}:3306/stitch?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${stitch_db_username}
+        password: ${stitch_db_password}
+      pool-name: DateHikariCP
+      minimum-idle: 5
+      idle-timeout: 180000
+      maximum-pool-size: 10
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+# 开发环境配置
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+#数据库配置
+charizard_db_ip: 192.168.0.17
+charizard_db_username: zbhr
+charizard_db_password: zbhr@hr
+
+stitch_db_ip: 192.168.0.17
+stitch_db_username: zbhr
+stitch_db_password: zbhr@hr
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+
+runModel: http://192.168.0.160:10014/startFlow
+#测试环境配置
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+#数据库配置
+charizard_db_ip: 192.168.0.28
+charizard_db_username: jiwei
+charizard_db_password: xN8yNCT&
+
+stitch_db_ip: 192.168.0.28
+stitch_db_username: jiwei
+stitch_db_password: xN8yNCT&
+
+runModel: http://192.168.0.29:10014/startFlow
